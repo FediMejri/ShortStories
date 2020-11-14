@@ -17,6 +17,12 @@ require('./models/Story')
 
 require('./config/passport')(passport)
 
+const {
+    truncate,
+    formatDate,
+    select
+} = require('./helpers/hbs')
+
 mongoose.Promise=global.Promise
 mongoose.connect(keys.mongoURI,{
     useNewUrlParser: true 
@@ -32,6 +38,11 @@ app.use(bodyParser.urlencoded({extended:false}))
 app.use(bodyParser.json())
 
 app.engine('handlebars', exphbs({
+    helpers:{
+        truncate : truncate,
+        formatDate: formatDate,
+        select : select 
+    },
     handlebars: allowInsecurePrototypeAccess(Handlebars)
 }))
 

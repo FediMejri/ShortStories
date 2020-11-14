@@ -1,1 +1,29 @@
-<h1>Edit the story</h1>
+<h1>Edit story</h1>
+<div class="row">
+    <form action="/stories/{{story.id}}" method="post" class="col s12">
+        <input type="text" name="title" value={{story.title}}>
+        <br>
+        <label for="title"> Title</label>
+        <br>
+        <select name="status">
+            {{#select story.status}}
+            <option value="public" selected>Public</option>
+            <option value="private">Private</option>
+            <option value="unpublished">Unpublished</option>
+            {{/select}}
+        </select>
+        <label for="status">Status</label>
+        <br>
+        <p>
+            <label>
+                <input type="checkbox" name="allowComments" class="filled-in" {{#if story.allowComments}} checked="checked" {{/if}} />
+                <span>Allow Comments</span>
+            </label>
+        </p>
+        <br>
+        <h5>Tell us your story</h5>
+        <textarea name="body">{{story.body}}</textarea>
+        <br>
+        <input type="submit" value="Save" class="btn">
+    </form>
+</div>
