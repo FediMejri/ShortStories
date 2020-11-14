@@ -14,7 +14,7 @@ module.exports = function(passport){
         },(accessToken, refreshToken, profile, done)=>{
             //console.log(accessToken)
             //console.log(profile)
-            const image = profile.photos[0].value.substring(0,profile.photos[0].value.indexOf('?'))
+            const image = profile.photos[0].value.substring(0,profile.photos[0].value.indexOf('='))
             const newUser={
                 googleID : profile.id,
                 firstName : profile.name.givenName,
