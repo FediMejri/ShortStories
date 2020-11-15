@@ -8,7 +8,9 @@ const Story=mongoose.model('stories')
 const User = mongoose.model('users')
 
 router.get('/',(req,res)=>{
-    Story.find({status:'public'}).populate('user').then(stories=>{
+    Story.find({status:'public'}).populate('user')
+    .sort({date: 'desc'})
+    .then(stories=>{
         res.render('stories/index',{
             stories:stories
         })
@@ -21,15 +23,19 @@ router.get('/add',ensureAuthenticated,(req,res)=>{
 
 router.get('/edit/:id',ensureAuthenticated,(req,res)=>{
     Story.findOne({_id:req.params.id}).then(story=>{
-        res.render('stories/edit',{
-            story:story
-        })
+        if(story.user!= req.user.id){
+            res.redirect('/stories')
+        }else{
+            res.render('stories/edit',{
+                story:story
+            })
+        }
     })
 })
 
-router.get('/delete/:id',(req,res)=>{
+router.get('/delete/:id',ensureAuthenticated,(req,res)=>{
     const id = req.params.id
-    Story.remove({_id:id}).then(
+    Story.remove({_id:id}).exec().then(
         Story.find().then(stories=>{
             res.render('index/dashboard',{
                 stories: stories
@@ -56,7 +62,7 @@ router.post('/',(req,res)=>{
     .save()
     .then(story=>{
         const id = story.id
-        res.redirect('stories/show'+id)
+        res.redirect('stories/show/'+id)
     })
 })
 
@@ -82,10 +88,49 @@ router.post('/:id',(req,res)=>{
 })
 
 router.get('/show/:id',(req,res)=>{
-    Story.findOne({_id:req.params.id}).populate('user')
+    Story.findOne({_id:req.params.id}).populate('user').populate('comments.commentUser')
     .then(story=>{
-        res.render('stories/show',{
-            story:story
+        if(story.status=='public'){
+            res.render('stories/show',{
+                story:story
+            })
+        }else{
+            if(req.user){
+                if(req.user.id==story.user._id){
+                    res.render('stories/show',{
+                        story:story
+                    })
+                }else{
+                    res.redirect('/stories')
+                }
+            }else{
+                res.redirect('/stories')
+            }
+        }
+    })
+})
+
+router.post('/comment/:id',(req,res)=>{
+    Story.findOne({_id:req.params.id})
+    .then(story=>{
+        const newComment={
+            commentBody:req.body.commentBody,
+            commentUser:req.user.id
+        }
+        story.comments.unshift(newComment)
+        story.save()
+        .then(story=>{
+            res.redirect('/stories/show/'+story.id)
+        })
+    })
+})
+
+router.get('/my',ensureAuthenticated,(req,res)=>{
+    Story.find({user:req.user.id})
+    .populate('user')
+    .then(stories=>{
+        res.render('stories/index',{
+            stories:stories
         })
     })
 })
