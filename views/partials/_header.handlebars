@@ -1,7 +1,10 @@
 <nav  class="grey darken-3">
   <div class="nav-wrapper">
     <a href="/" class="brand-logo left">ShortStories</a>
+    {{#if user}}
+    {{else}}
     <a href="/auth/google" class="btn" style="margin-left:200px; padding-bottom:60px; padding-top:0px;"><i class="fa fa-google"></i> Login with google</a>
+    {{/if}}
     <ul class="right hide-on-small-only">
       <li><a href="/stories"><i class="fa fa-book"></i> Public Stories</a></li>
       <li><a href="/about">About</a></li>
